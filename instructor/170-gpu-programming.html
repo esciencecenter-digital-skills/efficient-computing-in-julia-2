@@ -453,7 +453,7 @@
       </div>
       <hr></nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>(extra) GPU</h1>
-        <p>Last updated on 2025-01-12 |
+        <p>Last updated on 2025-01-13 |
 
         <a href="https://example.com/FIXME-template-source/edit/main/episodes/170-gpu-programming.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -654,7 +654,7 @@ image, in this case <code>480</code> seemed to work.</p>
 <div class="codewrapper sourceCode" id="cb10">
 <h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="pp">@btime</span> <span class="cf">begin</span> <span class="fu">julia_dev</span>(backend, <span class="fl">480</span>)(c, <span class="fl">1f0</span><span class="op">/</span><span class="fl">600</span>, <span class="fl">1024</span>, out, ndrange<span class="op">=</span><span class="fu">size</span>(out)); <span class="fu">Array</span>(out) <span class="cf">end</span></span></code></pre>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="pp">@benchmark</span> <span class="cf">begin</span> <span class="fu">julia_dev</span>(backend, <span class="fl">480</span>)(c, <span class="fl">1f0</span><span class="op">/</span><span class="fl">600</span>, <span class="fl">1024</span>, out, ndrange<span class="op">=</span><span class="fu">size</span>(out)); <span class="fu">Array</span>(out) <span class="cf">end</span></span></code></pre>
 </div>
 </div>
 </div>
@@ -736,8 +736,8 @@ any links that you are not going to use.
   "url": "https://FIXME-template-source.github.io/NA/instructor/170-gpu-programming.html",
   "identifier": "https://FIXME-template-source.github.io/NA/instructor/170-gpu-programming.html",
   "dateCreated": "2025-01-12",
-  "dateModified": "2025-01-12",
-  "datePublished": "2025-01-12"
+  "dateModified": "2025-01-13",
+  "datePublished": "2025-01-13"
 }
 
   </script><script>
