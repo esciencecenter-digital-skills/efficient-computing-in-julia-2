@@ -181,6 +181,11 @@ end
 ::::
 :::
 
+## Some important first lessons
+
+- Always enclose code in functions because functions are compiled
+- Don't use global mutable variables
+
 ::: keypoints
 
 - Julia has `if-else`, `for`, `while`, `function` and `module` blocks that are not dissimilar from other languages.
