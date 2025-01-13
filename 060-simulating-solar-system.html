@@ -254,7 +254,9 @@
       <div class="accordion-body">
         <ul><li><a href="#introduction-to-unitful">Introduction to <code>Unitful</code></a></li>
 <li><a href="#particles">Particles</a></li>
+<li><a href="#the-kick">The kick</a></li>
 <li><a href="#with-random-particles">With random particles</a></li>
+<li><a href="#solar-system">Solar System</a></li>
         </ul></div><!--/div.accordion-body-->
     </div><!--/div.accordion-collapse-->
 
@@ -454,7 +456,7 @@
       </div>
       <hr></nav><main id="main-content" class="main-content"><div class="container lesson-content">
         <h1>Simulating the Solar System</h1>
-        <p>Last updated on 2025-01-12 |
+        <p>Last updated on 2025-01-13 |
 
         <a href="https://example.com/FIXME-template-source/edit/main/episodes/060-simulating-solar-system.md" class="external-link">Edit this page <i aria-hidden="true" data-feather="edit"></i></a></p>
 
@@ -499,7 +501,8 @@
 <p>In this episode we’ll be building a simulation of the solar system.
 That is, we’ll only consider the Sun, Earth and Moon, but feel free to
 add other planets to the mix later on! To do this we need to work with
-the laws of gravity.</p>
+the laws of gravity. We will be going on extreme tangents, exposing
+interesting bits of the Julia language as we go.</p>
 <section><h2 class="section-heading" id="introduction-to-unitful">Introduction to <code>Unitful</code>
 <a class="anchor" aria-label="anchor" href="#introduction-to-unitful"></a></h2>
 <hr class="half-width"><p>We’ll be using the <code>Unitful</code> library to ensure that we
@@ -540,7 +543,8 @@ creative. Can you understand the error messages?</p>
 <div class="codewrapper sourceCode" id="cb4">
 <h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">GeometryBasics</span></span></code></pre>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">LinearAlgebra</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="im">using</span> <span class="bu">GeometryBasics</span></span></code></pre>
 </div>
 <p>Libraries in Julia tend to work well together, even if they’re not
 principally designed to do so. We can combine <code>Vec3d</code> with
@@ -569,7 +573,7 @@ function</a>. Can you figure out a way to generate a random
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <p>One way is to generate three random numbers and convert the resulting
 array to a <code>Vec3d</code>:</p>
@@ -591,48 +595,155 @@ array to a <code>Vec3d</code>:</p>
 </div>
 </div>
 </div>
-</section><section><h2 class="section-heading" id="particles">Particles<a class="anchor" aria-label="anchor" href="#particles"></a></h2>
-<hr class="half-width"><p>We are now ready to define the <code>Particle</code> type.</p>
-<div class="codewrapper sourceCode" id="gravity">
-<h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="gravity-1"><a href="#gravity-1" tabindex="-1"></a><span class="kw">mutable struct</span> Particle</span>
-<span id="gravity-2"><a href="#gravity-2" tabindex="-1"></a>	mass<span class="op">::</span><span class="dt">typeof</span>(<span class="fl">1.0</span>u<span class="st">"kg"</span>)</span>
-<span id="gravity-3"><a href="#gravity-3" tabindex="-1"></a>	position<span class="op">::</span><span class="dt">typeof</span>(<span class="fu">Vec3d</span>(<span class="fl">1</span>)u<span class="st">"m"</span>)</span>
-<span id="gravity-4"><a href="#gravity-4" tabindex="-1"></a>	velocity<span class="op">::</span><span class="dt">typeof</span>(<span class="fu">Vec3d</span>(<span class="fl">1</span>)u<span class="st">"m/s"</span>)</span>
-<span id="gravity-5"><a href="#gravity-5" tabindex="-1"></a><span class="kw">end</span></span></code></pre>
-</div>
 <p>Two bodies of mass <span class="math inline">\(M\)</span> and <span class="math inline">\(m\)</span> attract each other with the force</p>
 <p><span class="math display">\[F = \frac{GMm}{r^2},\]</span></p>
 <p>where <span class="math inline">\(r\)</span> is the distance between
 those bodies, and <span class="math inline">\(G\)</span> is the
 universal gravitational constant.</p>
-<div class="codewrapper sourceCode" id="gravity">
+<div class="codewrapper sourceCode" id="cb8">
 <h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="gravity-1"><a href="#gravity-1" tabindex="-1"></a><span class="kw">const</span> G <span class="op">=</span> <span class="fl">6.6743e-11</span>u<span class="st">"m^3*kg^-1*s^-2"</span></span></code></pre>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="kw">const</span> G <span class="op">=</span> <span class="fl">6.6743e-11</span>u<span class="st">"m^3*kg^-1*s^-2"</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">gravitational_force</span>(m1, m2, r) <span class="op">=</span> G <span class="op">*</span> m1 <span class="op">*</span> m2 <span class="op">/</span> r<span class="op">^</span><span class="fl">2</span></span></code></pre>
 </div>
+<p>Verify that the force exerted between two 1 million kg bodies at a
+distance of 2.5 meters is about equal to holding a 1kg object on Earth.
+Or equivalently two one tonne objects at a distance of 2.5 mm (all of
+the one tonne needs to be concentrated in a space tiny enough to get two
+of them at that close a distance)</p>
+<p>A better way to write the force would be,</p>
+<p><span class="math display">\[\vec{F} = \hat{r} \frac{G M
+m}{|r|^2},\]</span></p>
+<p>where <span class="math inline">\(\hat{r} = \vec{r} / |r|\)</span>,
+so in total we get a third power, <span class="math inline">\(|r|^3 =
+(r^2)^(3/2)\)</span>, where <span class="math inline">\(r^2\)</span> can
+be computed with the dot-product.</p>
+<div id="callout1" class="callout">
+<div class="callout-square">
+<i class="callout-icon" data-feather="bell"></i>
+</div>
+<div class="callout-inner">
+<h3 class="callout-title">Callout</h3>
+<div class="callout-content">
+<p>We will get to other sciences than physics later in this workshop, I
+promise!</p>
+</div>
+</div>
+</div>
+<div class="codewrapper sourceCode" id="cb9">
+<h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">gravitational_force</span>(m1, m2, r<span class="op">::</span><span class="dt">AbstractVector</span>) <span class="op">=</span> r <span class="op">*</span> (G <span class="op">*</span> m1 <span class="op">*</span> m2 <span class="op">*</span> (r <span class="op">⋅</span> r)<span class="op">^</span>(<span class="op">-</span><span class="fl">1.5</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="fu">gravitational_force</span>(<span class="fl">1e3</span>u<span class="st">"kg"</span>, <span class="fl">1e3</span>u<span class="st">"kg"</span>, <span class="fu">Vec3d</span>(<span class="fl">2.5</span>, <span class="fl">0</span>, <span class="fl">0</span>)u<span class="st">"mm"</span>) <span class="op">.|&gt;</span> u<span class="st">"N"</span></span></code></pre>
+</div>
+<div id="callout2" class="callout">
+<div class="callout-square">
+<i class="callout-icon" data-feather="bell"></i>
+</div>
+<div class="callout-inner">
+<h3 class="callout-title">Callout</h3>
+<div class="callout-content">
+<p>The <code>⋅</code> operator performs the
+<code>LinearAlgebra.dot</code> function. We could have done
+<code>sum(r * r)</code>. However, the <code>sum</code> function works on
+iterators and has a generic implementation. We could define our own
+<code>dot</code> function:</p>
+<div class="codewrapper sourceCode" id="cb10">
+<h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">dot</span>(a<span class="op">::</span><span class="dt">AbstractVector{T}</span>, b<span class="op">::</span><span class="dt">AbstractVector{T}</span>) <span class="kw">where</span> {T}</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>    Prod <span class="op">=</span> <span class="fu">typeof</span>(<span class="fu">zero</span>(T) <span class="op">*</span> <span class="fu">zero</span>(T))</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>	x <span class="op">=</span> <span class="fu">zero</span>(Prod)</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>	<span class="pp">@simd</span> ivdep <span class="cf">for</span> i <span class="kw">in</span> <span class="fu">eachindex</span>(a)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>		x <span class="op">+=</span> a[i] <span class="op">*</span> b[i]</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>	<span class="cf">end</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>	<span class="cf">return</span> x</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="kw">end</span></span></code></pre>
+</div>
+<p>If we look for the source</p>
+<pre><code>@which LinearAlgebra.dot(a, b)</code></pre>
+<p>We find that we’re actually running the dot product from the
+<code>StaticArrays</code> library, which has a very similar
+implementation as ours.</p>
+</div>
+</div>
+</div>
+<div id="the-zero-function" class="callout">
+<div class="callout-square">
+<i class="callout-icon" data-feather="bell"></i>
+</div>
+<div id="the-zero-function" class="callout-inner">
+<h3 class="callout-title">The <code>zero</code> function</h3>
+<div class="callout-content">
+<p>The <code>zero</code> function is overloaded to return a zero object
+for any type that has a natural definition of zero.</p>
+</div>
+</div>
+</div>
+<div id="the-one-function" class="callout discussion">
+<div class="callout-square">
+<i class="callout-icon" data-feather="message-circle"></i>
+</div>
+<div id="the-one-function" class="callout-inner">
+<h3 class="callout-title">The <code>one</code> function</h3>
+<div class="callout-content">
+<p>The return-value of <code>zero</code> should be the additive identity
+of the given type. So for any type <code>T</code>:</p>
+<div class="codewrapper sourceCode" id="cb12">
+<h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="kw">let</span> T <span class="op">=</span> <span class="dt">Int</span>, x <span class="op">=</span> <span class="fu">rand</span>(T); x <span class="op">==</span> x <span class="op">+</span> <span class="fu">zero</span>(T) <span class="kw">end</span></span></code></pre>
+</div>
+<p>There also is the <code>one</code> function which returns the
+multiplicative identity of a given type. Try to use the <code>*</code>
+operator on two strings. What do you expect <code>one(String)</code> to
+return?</p>
+</div>
+</div>
+</div>
+</section><section><h2 class="section-heading" id="particles">Particles<a class="anchor" aria-label="anchor" href="#particles"></a></h2>
+<hr class="half-width"><p>We are now ready to define the <code>Particle</code> type.</p>
+<div class="codewrapper sourceCode" id="cb13">
+<h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">Unitful</span>: Mass, Length, Velocity</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="kw">mutable struct</span> Particle</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>	mass<span class="op">::</span><span class="dt">typeof</span>(<span class="fl">1.0</span>u<span class="st">"kg"</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>	position<span class="op">::</span><span class="dt">typeof</span>(<span class="fu">Vec3d</span>(<span class="fl">1</span>)u<span class="st">"m"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>	momentum<span class="op">::</span><span class="dt">typeof</span>(<span class="fu">Vec3d</span>(<span class="fl">1</span>)u<span class="st">"kg*m/s"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="fu">Particle</span>(mass<span class="op">::</span><span class="dt">Mass</span>, position<span class="op">::</span><span class="dt">Vec3{L}</span>, velocity<span class="op">::</span><span class="dt">Vec3{V}</span>) <span class="kw">where</span> {L <span class="op">&lt;:</span><span class="dt"> Length</span>, V <span class="op">&lt;:</span><span class="dt"> Velocity</span>} <span class="op">=</span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>	<span class="fu">Particle</span>(mass, position, velocity <span class="op">*</span> mass)</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="fu">velocity</span>(p<span class="op">::</span><span class="dt">Particle</span>) <span class="op">=</span> p.momentum <span class="op">/</span> p.mass</span></code></pre>
+</div>
+<p>We store the momentum of the particle, so that what follows is
+slightly simplified.</p>
 <p>It is custom to divide the computation of orbits into a <em>kick</em>
 and <em>drift</em> function. (There are deep mathematical reasons for
 this that we won’t get into.) We’ll first implement the
 <code>kick!</code> function, that updates a collection of particles,
 given a certain time step.</p>
-<div class="codewrapper sourceCode" id="gravity">
+</section><section><h2 class="section-heading" id="the-kick">The kick<a class="anchor" aria-label="anchor" href="#the-kick"></a></h2>
+<hr class="half-width"><p>The following function performs the <code>kick!</code> operation on a
+set of particles. We’ll go on a little tangent for every line in the
+function.</p>
+<div class="codewrapper sourceCode" id="cb14">
 <h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="gravity-1"><a href="#gravity-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">kick!</span>(particles, dt)</span>
-<span id="gravity-2"><a href="#gravity-2" tabindex="-1"></a>	<span class="cf">for</span> i <span class="kw">in</span> <span class="fu">eachindex</span>(particles)</span>
-<span id="gravity-3"><a href="#gravity-3" tabindex="-1"></a>		a <span class="op">=</span> <span class="fu">zero</span>(Vec3d)u<span class="st">"m/s^2"</span></span>
-<span id="gravity-4"><a href="#gravity-4" tabindex="-1"></a>		<span class="cf">for</span> j <span class="kw">in</span> <span class="fu">eachindex</span>(particles)</span>
-<span id="gravity-5"><a href="#gravity-5" tabindex="-1"></a>			i <span class="op">==</span> j <span class="op">&amp;&amp;</span> <span class="cf">continue</span></span>
-<span id="gravity-6"><a href="#gravity-6" tabindex="-1"></a>			r <span class="op">=</span> particles[j].position <span class="op">-</span> particles[i].position</span>
-<span id="gravity-7"><a href="#gravity-7" tabindex="-1"></a>			r2 <span class="op">=</span> <span class="fu">sum</span>(r<span class="op">*</span>r)</span>
-<span id="gravity-8"><a href="#gravity-8" tabindex="-1"></a>			a <span class="op">+=</span> r <span class="op">*</span> (G <span class="op">*</span> particles[j].mass <span class="op">*</span> r2<span class="op">^</span>(<span class="op">-</span><span class="fl">1.5</span>))</span>
-<span id="gravity-9"><a href="#gravity-9" tabindex="-1"></a>		<span class="cf">end</span></span>
-<span id="gravity-10"><a href="#gravity-10" tabindex="-1"></a>		particles[i].velocity <span class="op">+=</span> dt <span class="op">*</span> a</span>
-<span id="gravity-11"><a href="#gravity-11" tabindex="-1"></a>	<span class="cf">end</span></span>
-<span id="gravity-12"><a href="#gravity-12" tabindex="-1"></a>	<span class="cf">return</span> particles</span>
-<span id="gravity-13"><a href="#gravity-13" tabindex="-1"></a><span class="kw">end</span></span></code></pre>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">kick!</span>(particles, dt)</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>	<span class="cf">for</span> i <span class="kw">in</span> <span class="fu">eachindex</span>(particles)</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>		<span class="cf">for</span> j <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>(i<span class="op">-</span><span class="fl">1</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>			r <span class="op">=</span> particles[j].position <span class="op">-</span> particles[i].position</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>            force <span class="op">=</span> <span class="fu">gravitational_force</span>(particles[i].mass, particles[j].mass, r)</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>            particles[i].momentum <span class="op">+=</span> dt <span class="op">*</span> force</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>            particles[j].momentum <span class="op">-=</span> dt <span class="op">*</span> force</span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>		<span class="cf">end</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>	<span class="cf">end</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a>	<span class="cf">return</span> particles</span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="kw">end</span></span></code></pre>
 </div>
 <div id="why-the-exclamation-mark" class="callout">
 <div class="callout-square">
@@ -655,28 +766,79 @@ of functions that mutate their arguments.</p>
 </h3>
 <div class="callout-content">
 <p>Note the way we used <code>eachindex</code>. This idiom guarantees
-that we can’t make out-of-bounds errors, and also this code is generic
-over different kinds of collections in Julia. We could have a
-<code>Vector{Particle}</code>, but a <code>Dict{Symbol, Particle}</code>
-would work just as well.</p>
+that we can’t make out-of-bounds errors. Also this kind of indexing is
+generic over other collections than vectors. However, this is
+immediately destroyed by our next loop.</p>
+</div>
+</div>
+</div>
+<div id="broadcasting-vs.-specialization" class="callout challenge">
+<div class="callout-square">
+<i class="callout-icon" data-feather="zap"></i>
+</div>
+<div id="broadcasting-vs.-specialization" class="callout-inner">
+<h3 class="callout-title">Broadcasting vs. specialization</h3>
+<div class="callout-content">
+<p>We’re subtracting two vectors. We could have written that with
+dot-notation indicating a broadcasted function application. Generate two
+random numbers:</p>
+<div class="codewrapper sourceCode" id="cb15">
+<h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>a, b <span class="op">=</span> <span class="fu">randn</span>(Vec3d, <span class="fl">2</span>)</span></code></pre>
+</div>
+<p>Then time the subtraction broadcasted and non-broadcasted. Which is
+faster? Why?</p>
+</div>
+</div>
+</div>
+<div id="accordionSolution2" class="accordion challenge-accordion accordion-flush">
+<div class="accordion-item">
+<button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
+  <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
+</button>
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
+<div class="accordion-body">
+<div class="codewrapper sourceCode" id="cb16">
+<h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="pp">@btime</span> a <span class="op">-</span> b</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="pp">@btime</span> a <span class="op">.-</span> b</span></code></pre>
+</div>
+<p>Broadcasting is slower. It seems to do some needless allocation.
+Clearly, the authors of <code>GeometryBasics</code> have taken effort to
+optimize basic vector operations.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="callout6" class="callout">
+<div class="callout-square">
+<i class="callout-icon" data-feather="bell"></i>
+</div>
+<div class="callout-inner">
+<h3 class="callout-title">Callout</h3>
+<div class="callout-content">
+<p>We’re iterating over the range <code>1:(i-1)</code>, and so we don’t
+compute forces twice. Momentum should be conserved!</p>
 </div>
 </div>
 </div>
 <p>Luckily the <code>drift!</code> function is much easier to implement,
 and doesn’t require that we know about all particles.</p>
-<div class="codewrapper sourceCode" id="gravity">
+<div class="codewrapper sourceCode" id="cb17">
 <h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="gravity-1"><a href="#gravity-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">drift!</span>(p<span class="op">::</span><span class="dt">Particle</span>, dt)</span>
-<span id="gravity-2"><a href="#gravity-2" tabindex="-1"></a>	p.position <span class="op">+=</span> dt <span class="op">*</span> p.velocity</span>
-<span id="gravity-3"><a href="#gravity-3" tabindex="-1"></a><span class="kw">end</span></span>
-<span id="gravity-4"><a href="#gravity-4" tabindex="-1"></a></span>
-<span id="gravity-5"><a href="#gravity-5" tabindex="-1"></a><span class="kw">function</span> <span class="fu">drift!</span>(particles, dt)</span>
-<span id="gravity-6"><a href="#gravity-6" tabindex="-1"></a>	<span class="cf">for</span> p <span class="kw">in</span> <span class="fu">values</span>(particles)</span>
-<span id="gravity-7"><a href="#gravity-7" tabindex="-1"></a>		<span class="fu">drift!</span>(p, dt)</span>
-<span id="gravity-8"><a href="#gravity-8" tabindex="-1"></a>	<span class="cf">end</span></span>
-<span id="gravity-9"><a href="#gravity-9" tabindex="-1"></a>	<span class="cf">return</span> particles</span>
-<span id="gravity-10"><a href="#gravity-10" tabindex="-1"></a><span class="kw">end</span></span></code></pre>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">drift!</span>(p<span class="op">::</span><span class="dt">Particle</span>, dt)</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>	p.position <span class="op">+=</span> dt <span class="op">*</span> p.momentum <span class="op">/</span> p.mass</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a><span class="kw">function</span> <span class="fu">drift!</span>(particles, dt)</span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>	<span class="cf">for</span> p <span class="kw">in</span> <span class="fu">values</span>(particles)</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>		<span class="fu">drift!</span>(p, dt)</span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>	<span class="cf">end</span></span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>	<span class="cf">return</span> particles</span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a><span class="kw">end</span></span></code></pre>
 </div>
 <p>Note that we defined the <code>drift!</code> function twice, for
 different arguments. We’re using the dispatch mechanism to write
@@ -687,119 +849,126 @@ clean/readable code.</p>
 that of <em>fixing</em> arguments of functions to make them more
 composable. For instance, most comparison operators allow you to give a
 single argument, saving the second argument for a second invocation.</p>
-<div class="codewrapper sourceCode" id="cb8">
+<div class="codewrapper sourceCode" id="cb18">
 <h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">filter</span>(x <span class="op">-&gt;</span> x <span class="op">&lt;</span> <span class="fl">3</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">filter</span>(<span class="fu">&lt;</span>(<span class="fl">3</span>), <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>)</span></code></pre>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">filter</span>(x <span class="op">-&gt;</span> x <span class="op">&lt;</span> <span class="fl">3</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="fu">filter</span>(<span class="fu">&lt;</span>(<span class="fl">3</span>), <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>)</span></code></pre>
 </div>
 <p>and even</p>
-<div class="codewrapper sourceCode" id="cb9">
+<div class="codewrapper sourceCode" id="cb19">
 <h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">map</span>(<span class="fu">filter</span>(<span class="fu">&lt;</span>(<span class="fl">5</span>)), <span class="fu">eachcol</span>(<span class="fu">rand</span>(<span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">5</span>, <span class="fl">5</span>)))</span></code></pre>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">map</span>(<span class="fu">filter</span>(<span class="fu">&lt;</span>(<span class="fl">5</span>)), <span class="fu">eachcol</span>(<span class="fu">rand</span>(<span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">5</span>, <span class="fl">5</span>)))</span></code></pre>
 </div>
 <p>We can do a similar thing here:</p>
-<div class="codewrapper sourceCode" id="gravity">
+<div class="codewrapper sourceCode" id="cb20">
 <h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="gravity-1"><a href="#gravity-1" tabindex="-1"></a><span class="fu">kick!</span>(dt) <span class="op">=</span> <span class="bu">Base</span>.<span class="fu">Fix2</span>(kick!, dt)</span>
-<span id="gravity-2"><a href="#gravity-2" tabindex="-1"></a><span class="fu">drift!</span>(dt) <span class="op">=</span> <span class="bu">Base</span>.<span class="fu">Fix2</span>(drift!, dt)</span></code></pre>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">kick!</span>(dt) <span class="op">=</span> <span class="bu">Base</span>.<span class="fu">Fix2</span>(kick!, dt)</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="fu">drift!</span>(dt) <span class="op">=</span> <span class="bu">Base</span>.<span class="fu">Fix2</span>(drift!, dt)</span></code></pre>
 </div>
 <p>These kinds of identities let us be flexible in how to use and
 combine methods in different circumstances.</p>
-<div class="codewrapper sourceCode" id="gravity">
+<div class="codewrapper sourceCode" id="cb21">
 <h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="gravity-1"><a href="#gravity-1" tabindex="-1"></a><span class="fu">leap_frog!</span>(dt) <span class="op">=</span> <span class="fu">drift!</span>(dt) <span class="op">∘</span> <span class="fu">kick!</span>(dt)</span></code></pre>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">leap_frog!</span>(dt) <span class="op">=</span> <span class="fu">drift!</span>(dt) <span class="op">∘</span> <span class="fu">kick!</span>(dt)</span></code></pre>
 </div>
 <p>This defines the <code>leap_frog!</code> function as first performing
 a <code>kick!</code> and then a <code>drift!</code>. Another way to
 compose these functions is the <code>|&gt;</code> operator. In contrast
 to the <code>∘</code> operator, <code>|&gt;</code> is very popular and
 seen everywhere in Julia code bases.</p>
-<div class="codewrapper sourceCode" id="cb10">
+<div class="codewrapper sourceCode" id="cb22">
 <h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">leap_frog!</span>(particles, dt) <span class="op">=</span> particles <span class="op">|&gt;</span> <span class="fu">kick!</span>(dt) <span class="op">|&gt;</span> <span class="fu">drift!</span>(dt)</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">leap_frog!</span>(dt) <span class="op">=</span> <span class="bu">Base</span>.<span class="fu">Fix2</span>(leap_frog!, dt)</span></code></pre>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">leap_frog!</span>(particles, dt) <span class="op">=</span> particles <span class="op">|&gt;</span> <span class="fu">kick!</span>(dt) <span class="op">|&gt;</span> <span class="fu">drift!</span>(dt)</span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a><span class="fu">leap_frog!</span>(dt) <span class="op">=</span> <span class="bu">Base</span>.<span class="fu">Fix2</span>(leap_frog!, dt)</span></code></pre>
 </div>
 </div>
 </section><section><h2 class="section-heading" id="with-random-particles">With random particles<a class="anchor" aria-label="anchor" href="#with-random-particles"></a></h2>
 <hr class="half-width"><p>Let’s run a simulation with some random particles</p>
-<div class="codewrapper sourceCode" id="gravity">
+<div class="codewrapper sourceCode" id="cb23">
 <h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="gravity-1"><a href="#gravity-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">run_simulation</span>(particles, dt, n)</span>
-<span id="gravity-2"><a href="#gravity-2" tabindex="-1"></a>	result <span class="op">=</span> <span class="fu">Matrix</span><span class="dt">{typeof(Vec3d(1)u"m")}</span>(<span class="cn">undef</span>, n, <span class="fu">length</span>(particles))</span>
-<span id="gravity-3"><a href="#gravity-3" tabindex="-1"></a>	x <span class="op">=</span> <span class="fu">deepcopy</span>(particles)</span>
-<span id="gravity-4"><a href="#gravity-4" tabindex="-1"></a>	<span class="cf">for</span> c <span class="kw">in</span> <span class="fu">eachrow</span>(result)</span>
-<span id="gravity-5"><a href="#gravity-5" tabindex="-1"></a>		x <span class="op">=</span> <span class="fu">leap_frog!</span>(dt)(x)</span>
-<span id="gravity-6"><a href="#gravity-6" tabindex="-1"></a>		c[<span class="op">:</span>] <span class="op">=</span> [p.position for p <span class="kw">in</span> <span class="fu">values</span>(x)]</span>
-<span id="gravity-7"><a href="#gravity-7" tabindex="-1"></a>	<span class="cf">end</span></span>
-<span id="gravity-8"><a href="#gravity-8" tabindex="-1"></a>	<span class="fu">DataFrame</span>(<span class="op">:</span>time <span class="op">=&gt;</span> (<span class="fl">1</span><span class="op">:</span>n)dt, (<span class="fu">Symbol</span>.(<span class="st">"p"</span>, <span class="fu">keys</span>(particles)) <span class="op">.=&gt;</span> <span class="fu">eachcol</span>(result))<span class="op">...</span>)</span>
-<span id="gravity-9"><a href="#gravity-9" tabindex="-1"></a><span class="kw">end</span></span></code></pre>
-</div>
-<div class="codewrapper sourceCode" id="gravity">
-<h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="gravity-1"><a href="#gravity-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">random_orbits</span>(n, mass)</span>
-<span id="gravity-2"><a href="#gravity-2" tabindex="-1"></a>    <span class="fu">random_particle</span>() <span class="op">=</span> <span class="fu">Particle</span>(mass, <span class="fu">randn</span>(Vec3d)u<span class="st">"m"</span>, <span class="fu">randn</span>(Vec3d)u<span class="st">"mm/s"</span>)</span>
-<span id="gravity-3"><a href="#gravity-3" tabindex="-1"></a>	particles <span class="op">=</span> <span class="fu">set_still!</span>([<span class="fu">random_particle</span>() for _ <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n])</span>
-<span id="gravity-4"><a href="#gravity-4" tabindex="-1"></a>	<span class="fu">run_simulation</span>(particles, <span class="fl">1.0</span>u<span class="st">"s"</span>, <span class="fl">5000</span>)</span>
-<span id="gravity-5"><a href="#gravity-5" tabindex="-1"></a><span class="kw">end</span></span></code></pre>
-</div>
-<div class="section level3">
-<h3 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a></h3>
-<div class="codewrapper sourceCode" id="cb11">
-<h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">plot_orbits</span>(orbits<span class="op">::</span><span class="dt">DataFrame</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>	fig <span class="op">=</span> <span class="fu">Figure</span>()</span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>	ax <span class="op">=</span> <span class="fu">Axis3</span>(fig[<span class="fl">1</span>,<span class="fl">1</span>], limits<span class="op">=</span>((<span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>), (<span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>), (<span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>)))</span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>    <span class="cf">for</span> colname <span class="kw">in</span> <span class="fu">names</span>(orbits)[<span class="fl">2</span><span class="op">:</span><span class="kw">end</span>]</span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>        <span class="fu">scatter!</span>(ax, [orbits[<span class="fl">1</span>,colname] <span class="op">/</span> u<span class="st">"m"</span>])</span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>	    <span class="fu">lines!</span>(ax, orbits[!,colname] <span class="op">/</span> u<span class="st">"m"</span>)</span>
-<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>    <span class="cf">end</span></span>
-<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a></span>
-<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>	fig</span>
-<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="kw">end</span></span></code></pre>
-</div>
-<p>Try a few times with two random particles. You may want to use the
-<code>set_still!</code> function to negate any collective motion.</p>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">run_simulation</span>(particles, dt, n)</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>	result <span class="op">=</span> <span class="fu">Matrix</span><span class="dt">{typeof(Vec3d(1)u"m")}</span>(<span class="cn">undef</span>, n, <span class="fu">length</span>(particles))</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>	x <span class="op">=</span> <span class="fu">deepcopy</span>(particles)</span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>	<span class="cf">for</span> c <span class="kw">in</span> <span class="fu">eachrow</span>(result)</span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a>		x <span class="op">=</span> <span class="fu">leap_frog!</span>(dt)(x)</span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a>		c[<span class="op">:</span>] <span class="op">=</span> [p.position for p <span class="kw">in</span> <span class="fu">values</span>(x)]</span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a>	<span class="cf">end</span></span>
+<span id="cb23-8"><a href="#cb23-8" tabindex="-1"></a>	<span class="fu">DataFrame</span>(<span class="op">:</span>time <span class="op">=&gt;</span> (<span class="fl">1</span><span class="op">:</span>n)dt, (<span class="fu">Symbol</span>.(<span class="st">"p"</span>, <span class="fu">keys</span>(particles)) <span class="op">.=&gt;</span> <span class="fu">eachcol</span>(result))<span class="op">...</span>)</span>
+<span id="cb23-9"><a href="#cb23-9" tabindex="-1"></a><span class="kw">end</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="frame-of-reference">Frame of reference<a class="anchor" aria-label="anchor" href="#frame-of-reference"></a></h3>
 <p>We need to make sure that our entire system doesn’t have a net
 velocity. Otherwise it will be hard to visualize our results!</p>
-<div class="codewrapper sourceCode" id="gravity">
+<div class="codewrapper sourceCode" id="cb24">
 <h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="gravity-1"><a href="#gravity-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">set_still!</span>(particles)</span>
-<span id="gravity-2"><a href="#gravity-2" tabindex="-1"></a>	total_momentum <span class="op">=</span> <span class="fu">sum</span>(p.mass <span class="op">*</span> p.velocity <span class="cf">for</span> p <span class="kw">in</span> <span class="fu">values</span>(particles))</span>
-<span id="gravity-3"><a href="#gravity-3" tabindex="-1"></a>	total_mass <span class="op">=</span> <span class="fu">sum</span>(p.mass <span class="cf">for</span> p <span class="kw">in</span> <span class="fu">values</span>(particles))</span>
-<span id="gravity-4"><a href="#gravity-4" tabindex="-1"></a>	correction <span class="op">=</span> total_momentum <span class="op">/</span> total_mass</span>
-<span id="gravity-5"><a href="#gravity-5" tabindex="-1"></a>	<span class="cf">for</span> p <span class="kw">in</span> <span class="fu">values</span>(particles)</span>
-<span id="gravity-6"><a href="#gravity-6" tabindex="-1"></a>		p.velocity <span class="op">-=</span> correction</span>
-<span id="gravity-7"><a href="#gravity-7" tabindex="-1"></a>	<span class="cf">end</span></span>
-<span id="gravity-8"><a href="#gravity-8" tabindex="-1"></a>	<span class="cf">return</span> particles</span>
-<span id="gravity-9"><a href="#gravity-9" tabindex="-1"></a><span class="cf">end</span></span></code></pre>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">set_still!</span>(particles)</span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>	total_momentum <span class="op">=</span> <span class="fu">sum</span>(p.momentum <span class="cf">for</span> p <span class="kw">in</span> <span class="fu">values</span>(particles))</span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>	total_mass <span class="op">=</span> <span class="fu">sum</span>(p.mass <span class="cf">for</span> p <span class="kw">in</span> <span class="fu">values</span>(particles))</span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a>	correction <span class="op">=</span> total_momentum <span class="op">/</span> total_mass</span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a>	<span class="cf">for</span> p <span class="kw">in</span> <span class="fu">values</span>(particles)</span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a>		p.momentum <span class="op">-=</span> correction <span class="op">*</span> p.mass</span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a>	<span class="cf">end</span></span>
+<span id="cb24-8"><a href="#cb24-8" tabindex="-1"></a>	<span class="cf">return</span> particles</span>
+<span id="cb24-9"><a href="#cb24-9" tabindex="-1"></a><span class="cf">end</span></span></code></pre>
 </div>
-<div class="codewrapper sourceCode" id="gravity">
+</div>
+<div class="section level3">
+<h3 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a></h3>
+<div class="codewrapper sourceCode" id="cb25">
 <h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="gravity-1"><a href="#gravity-1" tabindex="-1"></a><span class="kw">const</span> SUN <span class="op">=</span> <span class="fu">Particle</span>(<span class="fl">2e30</span>u<span class="st">"kg"</span>,</span>
-<span id="gravity-2"><a href="#gravity-2" tabindex="-1"></a>    <span class="fu">Vec3d</span>(<span class="fl">0.0</span>)u<span class="st">"m"</span>,</span>
-<span id="gravity-3"><a href="#gravity-3" tabindex="-1"></a>    <span class="fu">Vec3d</span>(<span class="fl">0.0</span>)u<span class="st">"m/s"</span>)</span>
-<span id="gravity-4"><a href="#gravity-4" tabindex="-1"></a></span>
-<span id="gravity-5"><a href="#gravity-5" tabindex="-1"></a><span class="kw">const</span> EARTH <span class="op">=</span> <span class="fu">Particle</span>(<span class="fl">6e24</span>u<span class="st">"kg"</span>,</span>
-<span id="gravity-6"><a href="#gravity-6" tabindex="-1"></a>    <span class="fu">Vec3d</span>(<span class="fl">1.5e11</span>, <span class="fl">0</span>, <span class="fl">0</span>)u<span class="st">"m"</span>,</span>
-<span id="gravity-7"><a href="#gravity-7" tabindex="-1"></a>    <span class="fu">Vec3d</span>(<span class="fl">0</span>, <span class="fl">3e4</span>, <span class="fl">0</span>)u<span class="st">"m/s"</span>)</span>
-<span id="gravity-8"><a href="#gravity-8" tabindex="-1"></a></span>
-<span id="gravity-9"><a href="#gravity-9" tabindex="-1"></a><span class="kw">const</span> MOON <span class="op">=</span> <span class="fu">Particle</span>(<span class="fl">7.35e22</span>u<span class="st">"kg"</span>,</span>
-<span id="gravity-10"><a href="#gravity-10" tabindex="-1"></a>    EARTH.position <span class="op">+</span> <span class="fu">Vec3d</span>(<span class="fl">3.844e8</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>)u<span class="st">"m"</span>,</span>
-<span id="gravity-11"><a href="#gravity-11" tabindex="-1"></a>    EARTH.velocity <span class="op">+</span> <span class="fu">Vec3d</span>(<span class="fl">0</span>, <span class="fl">1e3</span>, <span class="fl">0</span>)u<span class="st">"m/s"</span>)</span></code></pre>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="im">using</span> <span class="bu">GLMakie</span></span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a><span class="kw">function</span> <span class="fu">plot_orbits</span>(orbits<span class="op">::</span><span class="dt">DataFrame</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>	fig <span class="op">=</span> <span class="fu">Figure</span>()</span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a>	ax <span class="op">=</span> <span class="fu">Axis3</span>(fig[<span class="fl">1</span>,<span class="fl">1</span>], limits<span class="op">=</span>((<span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>), (<span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>), (<span class="op">-</span><span class="fl">5</span>, <span class="fl">5</span>)))</span>
+<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a>    <span class="cf">for</span> colname <span class="kw">in</span> <span class="fu">names</span>(orbits)[<span class="fl">2</span><span class="op">:</span><span class="kw">end</span>]</span>
+<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a>        <span class="fu">scatter!</span>(ax, [orbits[<span class="fl">1</span>,colname] <span class="op">/</span> u<span class="st">"m"</span>])</span>
+<span id="cb25-10"><a href="#cb25-10" tabindex="-1"></a>	    <span class="fu">lines!</span>(ax, orbits[!,colname] <span class="op">/</span> u<span class="st">"m"</span>)</span>
+<span id="cb25-11"><a href="#cb25-11" tabindex="-1"></a>    <span class="cf">end</span></span>
+<span id="cb25-12"><a href="#cb25-12" tabindex="-1"></a></span>
+<span id="cb25-13"><a href="#cb25-13" tabindex="-1"></a>	fig</span>
+<span id="cb25-14"><a href="#cb25-14" tabindex="-1"></a><span class="kw">end</span></span></code></pre>
+</div>
+<p>Try a few times with two random particles. You may want to use the
+<code>set_still!</code> function to negate any collective motion.</p>
+<div class="codewrapper sourceCode" id="cb26">
+<h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="kw">function</span> <span class="fu">random_orbits</span>(n, mass)</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>    <span class="fu">random_particle</span>() <span class="op">=</span> <span class="fu">Particle</span>(mass, <span class="fu">randn</span>(Vec3d)u<span class="st">"m"</span>, <span class="fu">randn</span>(Vec3d)u<span class="st">"mm/s"</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>	particles <span class="op">=</span> <span class="fu">set_still!</span>([<span class="fu">random_particle</span>() for _ <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>n])</span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>	<span class="fu">run_simulation</span>(particles, <span class="fl">1.0</span>u<span class="st">"s"</span>, <span class="fl">5000</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a><span class="fu">random_orbits</span>(<span class="fl">3</span>, <span class="fl">1e6</span>u<span class="st">"kg"</span>) <span class="op">|&gt;</span> plot_orbits</span></code></pre>
+</div>
+</div>
+</section><section><h2 class="section-heading" id="solar-system">Solar System<a class="anchor" aria-label="anchor" href="#solar-system"></a></h2>
+<hr class="half-width"><div class="codewrapper sourceCode" id="cb27">
+<h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="kw">const</span> SUN <span class="op">=</span> <span class="fu">Particle</span>(<span class="fl">2e30</span>u<span class="st">"kg"</span>,</span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a>    <span class="fu">Vec3d</span>(<span class="fl">0.0</span>)u<span class="st">"m"</span>,</span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a>    <span class="fu">Vec3d</span>(<span class="fl">0.0</span>)u<span class="st">"m/s"</span>)</span>
+<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a><span class="kw">const</span> EARTH <span class="op">=</span> <span class="fu">Particle</span>(<span class="fl">6e24</span>u<span class="st">"kg"</span>,</span>
+<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a>    <span class="fu">Vec3d</span>(<span class="fl">1.5e11</span>, <span class="fl">0</span>, <span class="fl">0</span>)u<span class="st">"m"</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a>    <span class="fu">Vec3d</span>(<span class="fl">0</span>, <span class="fl">3e4</span>, <span class="fl">0</span>)u<span class="st">"m/s"</span>)</span>
+<span id="cb27-8"><a href="#cb27-8" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" tabindex="-1"></a><span class="kw">const</span> MOON <span class="op">=</span> <span class="fu">Particle</span>(<span class="fl">7.35e22</span>u<span class="st">"kg"</span>,</span>
+<span id="cb27-10"><a href="#cb27-10" tabindex="-1"></a>    EARTH.position <span class="op">+</span> <span class="fu">Vec3d</span>(<span class="fl">3.844e8</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>)u<span class="st">"m"</span>,</span>
+<span id="cb27-11"><a href="#cb27-11" tabindex="-1"></a>    <span class="fu">velocity</span>(EARTH) <span class="op">+</span> <span class="fu">Vec3d</span>(<span class="fl">0</span>, <span class="fl">1e3</span>, <span class="fl">0</span>)u<span class="st">"m/s"</span>)</span></code></pre>
 </div>
 <div id="challenge" class="callout discussion">
 <div class="callout-square">
@@ -813,20 +982,6 @@ velocity. Otherwise it will be hard to visualize our results!</p>
 there. Can you figure out the period of the orbit?</p>
 </div>
 </div>
-</div>
-<div class="codewrapper sourceCode" id="cb12" file="examples/Gravity/src/Gravity.jl">
-<h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
-</h3>
-<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="kw">module</span> Gravity</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a></span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="im">using</span> <span class="bu">Unitful</span></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="im">using</span> <span class="bu">GLMakie</span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="im">using</span> <span class="bu">GeometryBasics</span></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="im">using</span> <span class="bu">DataFrames</span></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a></span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="op">&lt;&lt;</span>gravity<span class="op">&gt;&gt;</span></span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a></span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="kw">end</span></span></code></pre>
 </div>
 <div id="keypoints1" class="callout keypoints">
 <div class="callout-square">
@@ -848,7 +1003,6 @@ generally stable and very efficient once things have been compiled.</li>
 Place links that you need to refer to multiple times across pages here. Delete
 any links that you are not going to use.
  -->
-</div>
 </section></div> <!-- / div.lesson-content -->
     </main><!-- / main#main-content.main-content --><nav class="bottom-pagination mx-md-4" aria-label="Previous and Next Chapter"><div class="d-block d-sm-block d-md-none">
         <a class="chapter-link" href="050-arrays-and-broadcasting.html"><i aria-hidden="true" class="small-arrow" data-feather="arrow-left"></i>Previous</a>
@@ -907,7 +1061,7 @@ any links that you are not going to use.
   "url": "https://FIXME-template-source.github.io/NA/060-simulating-solar-system.html",
   "identifier": "https://FIXME-template-source.github.io/NA/060-simulating-solar-system.html",
   "dateCreated": "2025-01-12",
-  "dateModified": "2025-01-12",
+  "dateModified": "2025-01-13",
   "datePublished": "2025-01-13"
 }
 
