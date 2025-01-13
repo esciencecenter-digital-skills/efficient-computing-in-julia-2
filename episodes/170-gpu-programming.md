@@ -138,6 +138,7 @@ end
 @benchmark begin c_dev .= a_dev .+ b_dev; KernelAbstractions.synchronize(dev) end
 @benchmark c .= a .+ b
 ```
+::::
 :::
 
 ::: challenge
