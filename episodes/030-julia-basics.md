@@ -116,6 +116,43 @@ end
 The `for` loop iterates over the range `2:isqrt(x)`. We'll see that Julia indexes sequences starting at integer value `1`. This usually implies that ranges are given inclusive on both ends: for example, `collect(3:6)` evaluates to `[3, 4, 5, 6]`.
 :::
 
+::: challenge
+The `i == j && continue` is a short-cut notation for
+
+```julia
+if i == j
+	continue
+end
+```
+
+We could also have written `i != j || continue`.
+
+In general, the `||` and `&&` operators can be chained to check increasingly stringent tests. For example:
+
+```julia
+inbounds(Bool, i, data) && data[i] < 10 && return 3*data[i]
+```
+
+Here, the second condition can only be evaluated if the first one was true.
+
+**Rewrite the `is_prime` function using this notation.**
+
+:::: solution
+```julia
+function is_prime(x)
+    x < 2 && return false
+    for i = 2:isqrt(x)
+        x % i == 0 && return false
+    end
+    return true
+end
+
+is_prime(42)
+is_prime(43)
+```
+::::
+:::
+
 :::callout
 
 ### Return statement
@@ -178,6 +215,11 @@ for i in 1:100
 end
 ```
 
+If you like to collect those into a vector, try the following:
+
+```julia
+1:100 |> filter(is_prime) |> collect
+```
 ::::
 :::
 
