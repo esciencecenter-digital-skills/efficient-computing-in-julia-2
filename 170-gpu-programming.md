@@ -137,7 +137,7 @@ all(Array(out) .== out_host)
 ```
 
 ```julia
-@btime begin julia_dev(backend, 480)(c, 1f0/600, 1024, out, ndrange=size(out)); Array(out) end
+@benchmark begin julia_dev(backend, 480)(c, 1f0/600, 1024, out, ndrange=size(out)); Array(out) end
 ```
 ::::
 :::

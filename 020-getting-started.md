@@ -127,7 +127,22 @@ julia> Pluto.run()
 ```
 
 ## VS Code
-VS Code is the editor for which Julia has the best support.
+VS Code is the editor for which Julia has the best support. We'll be needing to run Julia in multiple threads later on, so we'll set some arguments for the REPL in `settings.json` (press `Ctrl-,`).
+
+```json
+{
+    ...
+    "julia.additionalArgs": [ 
+        "-t", "4"
+    ]
+}
+```
+
+Now when you start a new REPL, (`Ctrl-Shift-P`, search "Julia REPL") you can query the number of threads available:
+
+```julia
+Threads.nthreads()
+```
 
 :::challenge
 ### Julia as a calculator
@@ -148,7 +163,14 @@ d. Pluto updates all dependent computations automatically. This is known as a **
 :::
 
 ::: keypoints
-
 - In Julia, the REPL is much more important than in some other languages.
 - Pluto is a reactive environment
+- VS Code has the best editor integration for Julia
 :::
+
+```julia
+using GLMakie
+x = -10.0:0.01:10.0
+y = sinc.(x)
+lines(x, y)
+```
