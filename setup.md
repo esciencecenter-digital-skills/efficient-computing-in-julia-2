@@ -2,53 +2,83 @@
 title: Setup
 ---
 
-FIXME: Setup instructions live in this document. Please specify the tools and
-the data sets the Learner needs to have installed.
+This workshop is always taught using the latest release version of Julia. We use VS Code as our main environment. Depending on your experience, setting up your environment should take around 30min - 1h. We encourage you to also spend 1-2h exploring the Julia Manual.
 
-## Data Sets
+## Equipment
 
-<!--
-FIXME: place any data you want learners to use in `episodes/data` and then use
-       a relative link ( [data zip file](data/lesson-data.zip) ) to provide a
-       link to it, replacing the example.com link.
--->
-Download the [data zip file](https://example.com/FIXME) and unzip it to your Desktop
+You need a decent laptop with priviliges to install software. Julia is a compiled language and compiling can be demanding on your CPU. Specifically, something like a Chromebook or similar will definitely not do.
 
-## Software Setup
+## Install/Update Julia
 
-::::::::::::::::::::::::::::::::::::::: discussion
+::: tab
 
-### Details
+### New installation
+Install Julia by following the instruction on [the Julia webpage, downloads section](https://julialang.org/downloads/). This will also install `juliaup` which maintains different versions of Julia on your machine. If you installed Julia previously and you need to upgrade, run:
 
-Setup for different systems can be presented in dropdown menus via a `solution`
-tag. They will join to this discussion block, so you can give a general overview
-of the software used in this lesson here and fill out the individual operating
-systems (and potentially add more, e.g. online setup) in the solutions blocks.
+### Update old installation
+```bash
+juliaup update
+juliaup default release   # to be sure
+```
+:::
 
-:::::::::::::::::::::::::::::::::::::::::::::::::::
+## Install Dependencies
 
-:::::::::::::::: solution
+Prepare the courses package environment. Create a directory that you will work in:
 
-### Windows
+```bash
+mkdir EfficientJulia
+cd EfficientJulia
+julia
+```
 
-Use PuTTY
+Press `]` to enter package mode:
 
-:::::::::::::::::::::::::
+```julia
+(@v1.11) pkg> activate .
+(EfficientJulia) pkg> add GLMakie DataFrames BenchmarkTools GeometryBasics IterTools Revise Unitful
+```
 
-:::::::::::::::: solution
+This may take a while (which is why you need to do it in advance).
 
-### MacOS
+### GPU Libraries
 
-Use Terminal.app
+Install the GPU library for your backend (this is needed for the GPU computing part at the end of day 2). If you're not sure, these dependencies are relatively quick to install, so we can help during the setup session or in a break during the workshop.
 
-:::::::::::::::::::::::::
+::: tab
+### Intel
+If you run on an Intel based laptop, chances are that your laptop contains an onboard GPU (a tiny one). This GPU is accessible through Intel's oneAPI.
 
+```julia
+(EfficientJulia) pkg> add oneAPI KernelAbstractions
+```
 
-:::::::::::::::: solution
+### AMD
+AMD Graphics cards are programmed using ROCm. As far as we know there are no laptops with official ROCm support.
 
-### Linux
+```julia
+(EfficientJulia) pkg> add AMDGPU KernelAbstractions
+```
 
-Use Terminal
+### NVidia
+You probably know if you have an NVidia card. In that case CUDA is your goto.
 
-:::::::::::::::::::::::::
+```julia
+(EfficientJulia) pkg> add CUDA KernelAbstractions
+```
 
+### MacBook (M-series)
+Most current M-series MacBooks run on ARM and have a special architecture called Metal for GPU computing. Older MacBooks probably need to use Intel `oneAPI` or you might have a small NVidia card.
+
+```julia
+(EfficientJulia) pkg> add Metal KernelAbstractions
+```
+:::
+
+## VS Code
+
+Install [VS Code](https://code.visualstudio.com/). VS Code is the de-facto standard IDE for Julia. Within VS Code, install the Julia language plugin. Press the puzzle-piece icon in the toolbar and search for Julia, the top result should be the official extension.
+
+## Prepare
+
+If you have time, explore the [Julia Manual](https://docs.julialang.org/en/v1/). This is not mandatory, but you will learn a lot more in the workshop if you are prepared. Skim through from "Getting Started" until (including) "Methods", and spend one or two hours trying out things that you find interesting, while enjoying a nice cup of your favourite hot beverage.
