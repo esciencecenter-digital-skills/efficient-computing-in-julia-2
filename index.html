@@ -197,23 +197,12 @@
                   <div class="accordion accordion-flush" id="accordionFlushcurrent">
   <div class="accordion-item">
     <div class="accordion-header" id="flush-headingcurrent">
-      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapsecurrent" aria-expanded="true" aria-controls="flush-collapsecurrent">
         <span class="visually-hidden">Current Chapter</span>
         <span class="current-chapter">
         Summary and Setup
         </span>
-      </button>
+      
     </div><!--/div.accordion-header-->
-
-    <div id="flush-collapsecurrent" class="accordion-collapse collapse show" aria-labelledby="flush-headingcurrent" data-bs-parent="#accordionFlushcurrent">
-      <div class="accordion-body">
-        <ul><li><a href="#equipment">Equipment</a></li>
-<li><a href="#installupdate-julia">Install/Update Julia</a></li>
-<li><a href="#install-dependencies">Install Dependencies</a></li>
-<li><a href="#vs-code">VS Code</a></li>
-<li><a href="#prepare">Prepare</a></li>
-        </ul></div><!--/div.accordion-body-->
-    </div><!--/div.accordion-collapse-->
 
   </div><!--/div.accordion-item-->
 </div><!--/div.accordion-flush-->
@@ -516,17 +505,22 @@ provided after registration).</p>
 Place links that you need to refer to multiple times across pages here. Delete
 any links that you are not going to use.
  -->
-</section><section id="setup"><p>This workshop is always taught using the latest release version of
+</section><section id="setup"><div class="section level1">
+<h1 id="setup">Setup<a class="anchor" aria-label="anchor" href="#setup"></a></h1>
+<p>This workshop is always taught using the latest release version of
 Julia. We use VS Code as our main environment. Depending on your
 experience, setting up your environment should take around 30min - 1h.
 We encourage you to also spend 1-2h exploring the Julia Manual.</p>
-<section><h2 class="section-heading" id="equipment">Equipment<a class="anchor" aria-label="anchor" href="#equipment"></a></h2>
-<hr class="half-width"><p>You need a decent laptop with priviliges to install software. Julia
+<div class="section level2">
+<h2 id="equipment">Equipment<a class="anchor" aria-label="anchor" href="#equipment"></a></h2>
+<p>You need a decent laptop with priviliges to install software. Julia
 is a compiled language and compiling can be demanding on your CPU.
 Specifically, something like a Chromebook or similar will definitely not
 do.</p>
-</section><section><h2 class="section-heading" id="installupdate-julia">Install/Update Julia<a class="anchor" aria-label="anchor" href="#installupdate-julia"></a></h2>
-<hr class="half-width"><div class="tabs">
+</div>
+<div class="section level2">
+<h2 id="installupdate-julia">Install/Update Julia<a class="anchor" aria-label="anchor" href="#installupdate-julia"></a></h2>
+<div class="tabs">
 <nav><div id="nav-tab-1" class="nav nav-tabs" role="tablist">
 <button class="nav-link active" id="nav-tab-1-1" data-bs-toggle="tab" data-bs-target="#nav-tabpanel-1-1" type="button" role="tab" aria-controls="nav-tabpanel-1-1" aria-selected="true">
   <h3 class="tab-header" id="nav-tab-heading-1-1">
@@ -543,10 +537,10 @@ do.</p>
 <div id="nav-tabpanel-1-1" class="tab-pane show active" aria-labelledby="nav-tab-1-1" role="tabpanel">
 <p>Install Julia by following the instruction on <a href="https://julialang.org/downloads/" class="external-link">the Julia webpage, downloads
 section</a>. This will also install <code>juliaup</code> which maintains
-different versions of Julia on your machine. If you installed Julia
-previously and you need to upgrade, run:</p>
+different versions of Julia on your machine.</p>
 </div>
 <div id="nav-tabpanel-1-2" class="tab-pane" aria-labelledby="nav-tab-1-2" role="tabpanel">
+<p>If you installed Julia previously and you need to upgrade, run:</p>
 <div class="codewrapper sourceCode" id="cb1">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
 </h3>
@@ -556,8 +550,10 @@ previously and you need to upgrade, run:</p>
 </div>
 </div>
 </div>
-</section><section><h2 class="section-heading" id="install-dependencies">Install Dependencies<a class="anchor" aria-label="anchor" href="#install-dependencies"></a></h2>
-<hr class="half-width"><p>Prepare the courses package environment. Create a directory that you
+</div>
+<div class="section level2">
+<h2 id="install-dependencies">Install Dependencies<a class="anchor" aria-label="anchor" href="#install-dependencies"></a></h2>
+<p>Prepare the courses package environment. Create a directory that you
 will work in:</p>
 <div class="codewrapper sourceCode" id="cb2">
 <h3 class="code-label">BASH<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
@@ -647,13 +643,17 @@ card.</p>
 </div>
 </div>
 </div>
-</section><section><h2 class="section-heading" id="vs-code">VS Code<a class="anchor" aria-label="anchor" href="#vs-code"></a></h2>
-<hr class="half-width"><p>Install <a href="https://code.visualstudio.com/" class="external-link">VS Code</a>. VS Code
+</div>
+<div class="section level2">
+<h2 id="vs-code">VS Code<a class="anchor" aria-label="anchor" href="#vs-code"></a></h2>
+<p>Install <a href="https://code.visualstudio.com/" class="external-link">VS Code</a>. VS Code
 is the de-facto standard IDE for Julia. Within VS Code, install the
 Julia language plugin. Press the puzzle-piece icon in the toolbar and
 search for Julia, the top result should be the official extension.</p>
-</section><section><h2 class="section-heading" id="prepare">Prepare<a class="anchor" aria-label="anchor" href="#prepare"></a></h2>
-<hr class="half-width"><p>If you have time, explore the <a href="https://docs.julialang.org/en/v1/" class="external-link">Julia Manual</a>. This is not
+</div>
+<div class="section level2">
+<h2 id="prepare">Prepare<a class="anchor" aria-label="anchor" href="#prepare"></a></h2>
+<p>If you have time, explore the <a href="https://docs.julialang.org/en/v1/" class="external-link">Julia Manual</a>. This is not
 mandatory, but you will learn a lot more in the workshop if you are
 prepared. Skim through from “Getting Started” until (including)
 “Methods”, and spend one or two hours trying out things that you find
@@ -663,7 +663,10 @@ beverage.</p>
 Place links that you need to refer to multiple times across pages here. Delete
 any links that you are not going to use.
  -->
-</section></section></main><nav class="bottom-pagination mx-md-4" aria-label="Next Chapter"><!-- content for small screens --><div class="d-block d-sm-block d-md-none">
+</div>
+</div>
+
+      </section></main><nav class="bottom-pagination mx-md-4" aria-label="Next Chapter"><!-- content for small screens --><div class="d-block d-sm-block d-md-none">
         <a class="chapter-link float-end" href="020-getting-started.html">Next<i aria-hidden="true" class="small-arrow" data-feather="arrow-right"></i></a>
       </div>
       <!-- content for large screens -->

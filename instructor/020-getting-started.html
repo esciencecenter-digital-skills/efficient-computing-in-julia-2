@@ -498,7 +498,7 @@
 <button class="accordion-button instructor-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInstructor1" aria-expanded="false" aria-controls="collapseInstructor1">
   <h3 class="accordion-header" id="headingInstructor1">  <div class="note-square"><i aria-hidden="true" class="callout-icon" data-feather="edit-2"></i></div> Teaching strategy </h3>
 </button>
-<div id="collapseInstructor1" class="accordion-collapse collapse" aria-labelledby="headingInstructor1" data-bs-parent="#accordionInstructor1">
+<div id="collapseInstructor1" class="accordion-collapse collapse" data-bs-parent="#accordionInstructor1" aria-labelledby="headingInstructor1">
 <div class="accordion-body">
 <p>Julia is easy to get into because it centers around a few easy to
 understand core concepts: functions, multiple-dispatch, array
@@ -586,7 +586,10 @@ efficient computing?</p>
 </section><section><h2 class="section-heading" id="running-julia">Running Julia<a class="anchor" aria-label="anchor" href="#running-julia"></a></h2>
 <hr class="half-width"><p>When working in Julia it is very common to do so from the REPL
 (Read-Eval-Print Loop). Please open the Julia REPL on your system</p>
-<pre class="shell"><code>$ julia
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code>$ julia
                _
    _       _ _(_)_     |  Documentation: https://docs.julialang.org
   (_)     | (_) (_)    |
@@ -597,6 +600,7 @@ efficient computing?</p>
 |__/                   |
 
 julia&gt;</code></pre>
+</div>
 <p>The REPL needs a small introduction since it has several
 <strong>modes</strong>.</p>
 <table style="width:100%;" class="table"><colgroup><col width="26%"><col width="42%"><col width="31%"></colgroup><thead><tr class="header"><th>Key</th>
@@ -640,7 +644,7 @@ along. Find out what the <code>add</code> command does.</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution1" aria-expanded="false" aria-controls="collapseSolution1">
   <h4 class="accordion-header" id="headingSolution1"> Show me the solution </h4>
 </button>
-<div id="collapseSolution1" class="accordion-collapse collapse" aria-labelledby="headingSolution1" data-bs-parent="#accordionSolution1">
+<div id="collapseSolution1" class="accordion-collapse collapse" data-bs-parent="#accordionSolution1" aria-labelledby="headingSolution1">
 <div class="accordion-body">
 <ol style="list-style-type: lower-alpha"><li>
 <code>]help add</code>, the <code>add</code> command installs
@@ -665,7 +669,10 @@ packages</li>
 </section><section><h2 class="section-heading" id="pluto">Pluto<a class="anchor" aria-label="anchor" href="#pluto"></a></h2>
 <hr class="half-width"><p>Pluto is the notebook environment from which we will teach much of
 this workshop. We can run it from the Julia REPL.</p>
-<pre class="shell"><code>pkg&gt; add Pluto
+<div class="codewrapper">
+<h3 class="code-label">OUTPUT<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="output" tabindex="0"><code>pkg&gt; add Pluto
 ... quite a bit of output ...
 
 julia&gt; using Pluto
@@ -677,6 +684,7 @@ julia&gt; Pluto.run()
 ┌ Info:
 │ Press Ctrl+C in this terminal to stop Pluto
 └</code></pre>
+</div>
 </section><section><h2 class="section-heading" id="vs-code">VS Code<a class="anchor" aria-label="anchor" href="#vs-code"></a></h2>
 <hr class="half-width"><p>VS Code is the editor for which Julia has the best support. We’ll be
 needing to run Julia in multiple threads later on, so we’ll set some
@@ -722,7 +730,7 @@ upon?</li>
 <button class="accordion-button solution-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSolution2" aria-expanded="false" aria-controls="collapseSolution2">
   <h4 class="accordion-header" id="headingSolution2"> Show me the solution </h4>
 </button>
-<div id="collapseSolution2" class="accordion-collapse collapse" aria-labelledby="headingSolution2" data-bs-parent="#accordionSolution2">
+<div id="collapseSolution2" class="accordion-collapse collapse" data-bs-parent="#accordionSolution2" aria-labelledby="headingSolution2">
 <div class="accordion-body">
 <ol style="list-style-type: lower-alpha"><li>In Julia exponentiation is <code>^</code>.</li>
 <li>Just like you’re used to <code>x = 3</code>.</li>
@@ -768,7 +776,44 @@ VS Code, and make sure that the correct environment is there.</p>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>x <span class="op">=</span> <span class="op">-</span><span class="fl">3.0</span><span class="op">:</span><span class="fl">0.1</span><span class="op">:</span><span class="fl">3.0</span></span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>z <span class="op">=</span> <span class="fu">sinc</span>.(<span class="fu">sqrt</span>.(x<span class="op">.^</span><span class="fl">2</span> <span class="op">.+</span> x<span class="op">'.^</span><span class="fl">2</span>))</span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="fu">surface</span>(x, x, z, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="fu">wireframe!</span>(x, x, z, color<span class="op">=:</span>black)</span></code></pre>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="fu">wireframe!</span>(x, x, z, color<span class="op">=:</span>black, linewidth<span class="op">=</span><span class="fl">0.5</span>)</span></code></pre>
+</div>
+<figure><img src="../fig/getting-started-makie.png" alt="A 3d rendering of a sinc function." class="figure mx-auto d-block"><div class="figcaption">A 3D surface plot</div>
+</figure><div id="accordionSpoiler1" class="accordion spoiler-accordion accordion-flush">
+<div class="accordion-item">
+<button class="accordion-button spoiler-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSpoiler1" aria-expanded="false" aria-controls="collapseSpoiler1">
+  <h3 class="accordion-header" id="headingSpoiler1">  <div class="note-square"><i aria-hidden="true" class="callout-icon" data-feather="eye"></i></div> Figure code </h3>
+</button>
+<div id="collapseSpoiler1" class="accordion-collapse collapse" data-bs-parent="#accordionSpoiler1" aria-labelledby="headingSpoiler1">
+<div class="accordion-body">
+<p>To create the above figure:</p>
+<div class="codewrapper sourceCode" id="cb7">
+<h3 class="code-label">JULIA<i aria-hidden="true" data-feather="chevron-left"></i><i aria-hidden="true" data-feather="chevron-right"></i>
+</h3>
+<pre class="sourceCode julia" tabindex="0"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co">#| classes: ["task"]</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#| creates: episodes/fig/getting-started-makie.png</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="co">#| collect: figures</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="kw">module</span> Script</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="im">using</span> <span class="bu">GLMakie</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="kw">function</span> <span class="fu">main</span>()</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>    x <span class="op">=</span> <span class="op">-</span><span class="fl">3.0</span><span class="op">:</span><span class="fl">0.1</span><span class="op">:</span><span class="fl">3.0</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>    z <span class="op">=</span> <span class="fu">sinc</span>.(<span class="fu">sqrt</span>.(x<span class="op">.^</span><span class="fl">2</span> <span class="op">.+</span> x<span class="op">'.^</span><span class="fl">2</span>))</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>    fig <span class="op">=</span> <span class="fu">Figure</span>(size<span class="op">=</span>(<span class="fl">1024</span>, <span class="fl">768</span>))</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>    ax <span class="op">=</span> <span class="fu">Axis3</span>(fig[<span class="fl">1</span>,<span class="fl">1</span>])</span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>    <span class="fu">surface!</span>(ax, x, x, z, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>    <span class="fu">wireframe!</span>(ax, x, x, z, color<span class="op">=:</span>black, linewidth<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>    <span class="fu">save</span>(<span class="st">"episodes/fig/getting-started-makie.png"</span>, fig)</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="kw">end</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>Script.<span class="fu">main</span>()</span></code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <!--
 Place links that you need to refer to multiple times across pages here. Delete
