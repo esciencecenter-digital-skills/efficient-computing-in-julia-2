@@ -1,18 +1,17 @@
 ---
 title: Getting Started
+teaching: 40
+exercises: 10
 ---
 
 ::: questions
-
 - Why should I use Julia?
 - How do I get started with Julia?
 :::
 
 ::: objectives
-
 - Start a REPL
-- Start Pluto
-- Understand Pluto's behaviour (w.r.t. Jupyter)
+- Run lines from VS Code
 :::
 
 :::instructor
@@ -90,7 +89,7 @@ The REPL needs a small introduction since it has several **modes**.
 
 :::challenge
 
-### Play with the REPL
+### Play with the REPL (5min)
 
 a. `Pkg` mode has a `help` command to help you along. Find out what the `add` command does.
 b. Check the contents of the folder in which your are running your REPL (`ls` on Unix, `dir` on Windows).
@@ -145,7 +144,7 @@ Threads.nthreads()
 ```
 
 :::challenge
-### Julia as a calculator
+### Julia as a calculator (5min)
 
 Try to play around in Pluto to use Julia as a calculator.
 
@@ -168,9 +167,24 @@ d. Pluto updates all dependent computations automatically. This is known as a **
 - VS Code has the best editor integration for Julia
 :::
 
+## Activate the Workshop Environment
+
+For this workshop, we prepared an environment. Press `]` in the REPL to activate `Pkg` mode.
+Make sure that you are in the path where you prepared your environment (see Setup Instructions).
+
+```
+(v1.11) pkg> activate .
+(EfficientJulia) pkg>
+```
+
+Alternatively, check the little "Julia env" message at the bottom of VS Code, and make sure that the correct environment is there.
+
+You should now be able to generate a plot using `GLMakie` (that one dependency that made you wait)
+
 ```julia
 using GLMakie
-x = -10.0:0.01:10.0
-y = sinc.(x)
-lines(x, y)
+x = -3.0:0.1:3.0
+z = sinc.(sqrt.(x.^2 .+ x'.^2))
+surface(x, x, z, alpha=0.5)
+wireframe!(x, x, z, color=:black)
 ```

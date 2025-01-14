@@ -24,7 +24,9 @@ This workshop aims to get research software engineers from their first steps in 
 
 Participants will have to install Julia by following the instruction on [the Julia webpage, downloads section](https://julialang.org/downloads/). They should be provided an environment with a `Project.toml` so they can precompile any dependencies before the workshop starts. In most cases this should suffice, though we have encountered university-managed Windows laptops in the wild that gave problems.
 
-The workshop uses Pluto notebooks through-out.
+## Workflow
+
+We're teaching using VS Code as the main environment. If you prefer, you might also use Pluto, but interactive `Makie` plots don't work so well in Pluto (you'd use `PlutoUI` instead), and the `@profview` macro needs an extra dependency to work from Pluto.
 
 ## Sillabus
 
