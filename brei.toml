@@ -1,0 +1,6 @@
+include=[".entangled/tasks.json"]
+
+[runner.julia]
+command = "julia"
+args = ["--project=.", "-O0", "${script}"]
+

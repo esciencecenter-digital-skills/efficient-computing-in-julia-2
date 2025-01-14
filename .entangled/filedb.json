@@ -1,25 +1,28 @@
 {
   "files": [
     {
-      "deps": [],
-      "hexdigest": "7bb9de66306158195a10e724e13fbcd2d067c37706b4f1bc3f615737edc42274",
-      "modified": "2025-01-13T00:17:22.450971",
+      "deps": [
+        "episodes/020-getting-started.md",
+        "episodes/060-simulating-solar-system.md"
+      ],
+      "hexdigest": "58617f1d7a456054d71b1e15b6b033fe4cf72a76ada4d4513bd7d682e6384f3c",
+      "modified": "2025-01-14T14:49:43.850369",
       "path": ".entangled/tasks.json",
-      "size": 16
+      "size": 2031
     },
     {
       "deps": null,
-      "hexdigest": "d01e6dd30488cb2a32a833104e7946fba30ce1e0a922596b79ff4a1378840070",
-      "modified": "2025-01-12T23:34:33.641037",
+      "hexdigest": "a1f9d20deab0d89ec37bfbc2091551303989befaf23d421abeef10fb8da2c626",
+      "modified": "2025-01-14T13:53:47.807363",
       "path": "episodes/020-getting-started.md",
-      "size": 6339
+      "size": 8032
     },
     {
       "deps": null,
-      "hexdigest": "b53fe63bdae41ecc4ee927dd81fb854be67af23b5a58e4e346357777664825e5",
-      "modified": "2025-01-12T23:26:03.871989",
+      "hexdigest": "a25f78485734f3f50b96c94b57dc42737ee79954fb0281a0ef96bb78f3cedba1",
+      "modified": "2025-01-13T23:00:44.261199",
       "path": "episodes/030-julia-basics.md",
-      "size": 4187
+      "size": 5108
     },
     {
       "deps": null,
@@ -37,10 +40,10 @@
     },
     {
       "deps": null,
-      "hexdigest": "220452b4f9db201eb7de93764bd5282ba2f7c55c58b1133c259223f791491a06",
-      "modified": "2025-01-12T23:42:53.799898",
+      "hexdigest": "d4ec4268874428a0bcba8d8ce52f96bc6c4ca8d1330c1f0d0188b507feba31eb",
+      "modified": "2025-01-14T14:49:41.771351",
       "path": "episodes/060-simulating-solar-system.md",
-      "size": 7602
+      "size": 12300
     },
     {
       "deps": null,
@@ -58,8 +61,8 @@
     },
     {
       "deps": null,
-      "hexdigest": "897722bcc62c1ca3ee3868cd6698482901ad2a52e8bbf6a330daa17b01782da8",
-      "modified": "2025-01-12T23:26:03.871989",
+      "hexdigest": "b9641a2821999091e65ae8a7541a468b16a51de7e8458602cf3692e7b7296300",
+      "modified": "2025-01-13T10:39:40.349715",
       "path": "episodes/090-best-practices.md",
       "size": 1960
     },
@@ -72,10 +75,10 @@
     },
     {
       "deps": null,
-      "hexdigest": "5776d2869061e67d537cebb40c8db1c9f099e73fef50404baa827e7fe17b89ac",
-      "modified": "2025-01-12T23:26:03.871989",
+      "hexdigest": "37a7f7f8cba24b2ad46589e6e24ff1f492fe121dceccbd72fe24805e9c5f38a4",
+      "modified": "2025-01-13T10:34:00.806774",
       "path": "episodes/110-performance-analysis.md",
-      "size": 3999
+      "size": 5456
     },
     {
       "deps": null,
@@ -121,10 +124,10 @@
     },
     {
       "deps": null,
-      "hexdigest": "2ceb162f65d938df836c0722ad9844e0bd565e50522b0d3e79b7076ac8b0eccd",
-      "modified": "2025-01-12T23:26:03.871989",
+      "hexdigest": "ef3514f1447575db6e1c9d850db7311b19ae1a4c54b1ed8818c8def498ec34e1",
+      "modified": "2025-01-13T14:34:25.678372",
       "path": "episodes/170-gpu-programming.md",
-      "size": 3616
+      "size": 4804
     },
     {
       "deps": null,
@@ -149,48 +152,17 @@
     },
     {
       "deps": [
-        "episodes/a01-collatz.md"
-      ],
-      "hexdigest": "70bda431a5b73aafdb96fd8219742f66ff482e15b91aca5594266b7ebc5a54e9",
-      "modified": "2025-01-13T00:17:22.446971",
-      "path": "examples/Collatz/src/Collatz.jl",
-      "size": 1425
-    },
-    {
-      "deps": [
         "episodes/060-simulating-solar-system.md"
       ],
-      "hexdigest": "3c18bf708d78114b863a25917659cb6e7459944dca34b71c4ee12a8e40cdb36a",
-      "modified": "2025-01-13T00:17:22.448972",
-      "path": "examples/Gravity/src/Gravity.jl",
-      "size": 2838
-    },
-    {
-      "deps": [
-        "episodes/a02-julia-fractals.md",
-        "episodes/a01-collatz.md"
-      ],
-      "hexdigest": "76e788cc55deb4f3355962505adffebaa543a26bf17eeb7c7dba469886b3c7a4",
-      "modified": "2025-01-13T00:17:22.449971",
-      "path": "examples/JuliaFractal/src/JuliaFractal.jl",
-      "size": 2871
-    },
-    {
-      "deps": [
-        "episodes/a03-lorenz-attractor.md"
-      ],
-      "hexdigest": "7399a8544aea9e8dd36069c8304bfe2db3578d7d2176b35c4fa5a9d37329c0b2",
-      "modified": "2025-01-13T00:17:22.447971",
-      "path": "examples/Lorenz/src/Lorenz.jl",
-      "size": 270
+      "hexdigest": "59116ce49979a1680ff91272d68d5511ff1d67eb09c32b79eb9ce162f7f0ac99",
+      "modified": "2025-01-14T14:25:17.650334",
+      "path": "src/Gravity.jl",
+      "size": 4015
     }
   ],
   "source": [],
   "target": [
-    "examples/Collatz/src/Collatz.jl",
-    "examples/Gravity/src/Gravity.jl",
-    "examples/JuliaFractal/src/JuliaFractal.jl",
-    "examples/Lorenz/src/Lorenz.jl"
+    "src/Gravity.jl"
   ],
   "version": "2.1.10"
 }

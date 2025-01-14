@@ -64,7 +64,7 @@ Why are you interested in Julia? What is your current go-to for efficient comput
 
 When working in Julia it is very common to do so from the REPL (Read-Eval-Print Loop). Please open the Julia REPL on your system
 
-```shell
+```output
 $ julia
                _
    _       _ _(_)_     |  Documentation: https://docs.julialang.org
@@ -110,7 +110,7 @@ Please take a look at the Julia documentation now at [https://docs.julialang.org
 
 Pluto is the notebook environment from which we will teach much of this workshop. We can run it from the Julia REPL.
 
-```shell
+```output
 pkg> add Pluto
 ... quite a bit of output ...
 
@@ -186,5 +186,36 @@ using GLMakie
 x = -3.0:0.1:3.0
 z = sinc.(sqrt.(x.^2 .+ x'.^2))
 surface(x, x, z, alpha=0.5)
-wireframe!(x, x, z, color=:black)
+wireframe!(x, x, z, color=:black, linewidth=0.5)
 ```
+
+![A 3D surface plot](fig/getting-started-makie.png){alt="A 3d rendering of a sinc function."}
+
+::: spoiler
+### Figure code
+
+To create the above figure:
+
+```julia
+#| classes: ["task"]
+#| creates: episodes/fig/getting-started-makie.png
+#| collect: figures
+
+module Script
+using GLMakie
+
+function main()
+    x = -3.0:0.1:3.0
+    z = sinc.(sqrt.(x.^2 .+ x'.^2))
+
+    fig = Figure(size=(1024, 768))
+    ax = Axis3(fig[1,1])
+    surface!(ax, x, x, z, alpha=0.5)
+    wireframe!(ax, x, x, z, color=:black, linewidth=0.5)
+    save("episodes/fig/getting-started-makie.png", fig)
+end
+end
+
+Script.main()
+```
+:::

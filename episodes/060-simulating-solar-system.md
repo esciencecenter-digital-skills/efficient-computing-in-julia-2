@@ -87,6 +87,7 @@ $$F = \frac{GMm}{r^2},$$
 where $r$ is the distance between those bodies, and $G$ is the universal gravitational constant.
 
 ```julia
+#| id: gravity
 const G = 6.6743e-11u"m^3*kg^-1*s^-2"
 gravitational_force(m1, m2, r) = G * m1 * m2 / r^2
 ```
@@ -97,21 +98,25 @@ A better way to write the force would be,
 
 $$\vec{F} = \hat{r} \frac{G M m}{|r|^2},$$
 
-where $\hat{r} = \vec{r} / |r|$, so in total we get a third power, $|r|^3 = (r^2)^(3/2)$, where $r^2$ can be computed with the dot-product. 
-
-:::callout
-We will get to other sciences than physics later in this workshop, I promise!
-:::
+where $\hat{r} = \vec{r} / |r|$, so in total we get a third power, $|r|^3 = (r^2)^{3/2}$, where $r^2$ can be computed with the dot-product. 
 
 ```julia
+#| id: gravity
 gravitational_force(m1, m2, r::AbstractVector) = r * (G * m1 * m2 * (r ⋅ r)^(-1.5))
-
+```
+	
+```julia
 gravitational_force(1e3u"kg", 1e3u"kg", Vec3d(2.5, 0, 0)u"mm") .|> u"N"
 ```
 
 :::callout
-The `⋅` operator performs the `LinearAlgebra.dot` function. We could have done `sum(r * r)`.
-However, the `sum` function works on iterators and has a generic implementation. We could define our own `dot` function:
+Not all of you will be jumping up and down for doing high-school physics.
+We will get to other sciences than physics later in this workshop, I promise!
+:::
+
+
+:::callout
+The `⋅` operator (enter using `\cdot<TAB>`) performs the `LinearAlgebra.dot` function. We could have done `sum(r * r)`. However, the `sum` function works on iterators and has a generic implementation. We could define our own `dot` function:
 
 ```julia
 function dot(a::AbstractVector{T}, b::AbstractVector{T}) where {T}
@@ -153,15 +158,16 @@ There also is the `one` function which returns the multiplicative identity of a 
 We are now ready to define the `Particle` type.
 
 ```julia
+#| id: gravity
 using Unitful: Mass, Length, Velocity
 mutable struct Particle
-	mass::typeof(1.0u"kg")
-	position::typeof(Vec3d(1)u"m")
-	momentum::typeof(Vec3d(1)u"kg*m/s")
+    mass::typeof(1.0u"kg")
+    position::typeof(Vec3d(1)u"m")
+    momentum::typeof(Vec3d(1)u"kg*m/s")
 end
 
-Particle(mass::Mass, position::Vec3{L}, velocity::Vec3{V}) where {L <: Length, V <: Velocity} =
-	Particle(mass, position, velocity * mass)
+Particle(mass::Mass, position::Vec3{L}, velocity::Vec3{V}) where {L<:Length,V<:Velocity} =
+    Particle(mass, position, velocity * mass)
 
 velocity(p::Particle) = p.momentum / p.mass
 ```
@@ -175,16 +181,17 @@ We'll first implement the `kick!` function, that updates a collection of particl
 The following function performs the `kick!` operation on a set of particles. We'll go on a little tangent for every line in the function.
 
 ```julia
+#| id: gravity
 function kick!(particles, dt)
-	for i in eachindex(particles)
-		for j in 1:(i-1)
-			r = particles[j].position - particles[i].position
+    for i in eachindex(particles)
+        for j in 1:(i-1)
+            r = particles[j].position - particles[i].position
             force = gravitational_force(particles[i].mass, particles[j].mass, r)
             particles[i].momentum += dt * force
             particles[j].momentum -= dt * force
-		end
-	end
-	return particles
+        end
+    end
+    return particles
 end
 ```
 
@@ -226,15 +233,16 @@ We're iterating over the range `1:(i-1)`, and so we don't compute forces twice. 
 Luckily the `drift!` function is much easier to implement, and doesn't require that we know about all particles.
 
 ```julia
+#| id: gravity
 function drift!(p::Particle, dt)
-	p.position += dt * p.momentum / p.mass
+    p.position += dt * p.momentum / p.mass
 end
 
 function drift!(particles, dt)
-	for p in values(particles)
-		drift!(p, dt)
-	end
-	return particles
+    for p in values(particles)
+        drift!(p, dt)
+    end
+    return particles
 end
 ```
 
@@ -258,6 +266,7 @@ map(filter(<(5)), eachcol(rand(1:10, 5, 5)))
 We can do a similar thing here:
 
 ```julia
+#| id: gravity
 kick!(dt) = Base.Fix2(kick!, dt)
 drift!(dt) = Base.Fix2(drift!, dt)
 ```
@@ -265,6 +274,7 @@ drift!(dt) = Base.Fix2(drift!, dt)
 These kinds of identities let us be flexible in how to use and combine methods in different circumstances.
 
 ```julia
+#| id: gravity
 leap_frog!(dt) = drift!(dt) ∘ kick!(dt)
 ```
 
@@ -280,14 +290,15 @@ leap_frog!(dt) = Base.Fix2(leap_frog!, dt)
 Let's run a simulation with some random particles
 
 ```julia
+#| id: gravity
 function run_simulation(particles, dt, n)
-	result = Matrix{typeof(Vec3d(1)u"m")}(undef, n, length(particles))
-	x = deepcopy(particles)
-	for c in eachrow(result)
-		x = leap_frog!(dt)(x)
-		c[:] = [p.position for p in values(x)]
-	end
-	DataFrame(:time => (1:n)dt, (Symbol.("p", keys(particles)) .=> eachcol(result))...)
+    result = Matrix{typeof(Vec3d(1)u"m")}(undef, n, length(particles))
+    x = deepcopy(particles)
+    for c in eachrow(result)
+        x = leap_frog!(dt)(x)
+        c[:] = [p.position for p in values(x)]
+    end
+    DataFrame(:time => (1:n)dt, (Symbol.("p", keys(particles)) .=> eachcol(result))...)
 end
 ```
 
@@ -295,51 +306,59 @@ end
 We need to make sure that our entire system doesn't have a net velocity. Otherwise it will be hard to visualize our results!
 
 ```julia
+#| id: gravity
 function set_still!(particles)
-	total_momentum = sum(p.momentum for p in values(particles))
-	total_mass = sum(p.mass for p in values(particles))
-	correction = total_momentum / total_mass
-	for p in values(particles)
-		p.momentum -= correction * p.mass
-	end
-	return particles
+    total_momentum = sum(p.momentum for p in values(particles))
+    total_mass = sum(p.mass for p in values(particles))
+    correction = total_momentum / total_mass
+    for p in values(particles)
+        p.momentum -= correction * p.mass
+    end
+    return particles
 end
 ```
 
 ### Plotting
 
 ```julia
+#| id: gravity
 using DataFrames
 using GLMakie
 
 function plot_orbits(orbits::DataFrame)
-	fig = Figure()
-	ax = Axis3(fig[1,1], limits=((-5, 5), (-5, 5), (-5, 5)))
+    fig = Figure()
+    ax = Axis3(fig[1, 1], limits=((-5, 5), (-5, 5), (-5, 5)))
 
     for colname in names(orbits)[2:end]
-        scatter!(ax, [orbits[1,colname] / u"m"])
-	    lines!(ax, orbits[!,colname] / u"m")
+        scatter!(ax, [orbits[1, colname] / u"m"])
+        lines!(ax, orbits[!, colname] / u"m")
     end
 
-	fig
+    fig
 end
 ```
 
 Try a few times with two random particles. You may want to use the `set_still!` function to negate any collective motion.
 
 ```julia
+#| id: gravity
 function random_orbits(n, mass)
     random_particle() = Particle(mass, randn(Vec3d)u"m", randn(Vec3d)u"mm/s")
-	particles = set_still!([random_particle() for _ in 1:n])
-	run_simulation(particles, 1.0u"s", 5000)
+    particles = set_still!([random_particle() for _ in 1:n])
+    run_simulation(particles, 1.0u"s", 5000)
 end
-
+```
+	
+```julia
 random_orbits(3, 1e6u"kg") |> plot_orbits
 ```
+
+![Possible random orbits for two and three particles.](fig/random-orbits.png){alt="the three-body problem"}
 
 ## Solar System
 
 ```julia
+#| id: gravity
 const SUN = Particle(2e30u"kg",
     Vec3d(0.0)u"m",
     Vec3d(0.0)u"m/s")
@@ -362,4 +381,65 @@ Plot the orbit of the moon around the earth. Make a `Dataframe` that contains al
 ::: keypoints
 - `Plots.jl` is in some ways the 'standard' plotting package, but it is in fact quite horrible.
 - `Makie.jl` offers a nice interface, pretty plots, is generally stable and very efficient once things have been compiled.
+:::
+
+::: spoiler
+### Testing and Plots
+
+```julia
+#| file: src/Gravity.jl
+module Gravity
+
+using GLMakie
+using Unitful
+using GeometryBasics
+using DataFrames
+using LinearAlgebra
+
+<<gravity>>
+
+end
+```
+
+```julia
+#| classes: ["task"]
+#| creates: episodes/fig/random-orbits.png
+#| collect: figures
+
+module Script
+
+using Unitful
+using GLMakie
+using DataFrames
+using Random
+using EfficientJulia.Gravity: random_orbits
+
+function plot_orbits!(ax, orbits::DataFrame)
+    for colname in names(orbits)[2:end]
+        scatter!(ax, [orbits[1,colname] / u"m"])
+        lines!(ax, orbits[!,colname] / u"m")
+    end
+end
+
+function main()
+    Random.seed!(0)
+    orbs1 = random_orbits(2, 1e6u"kg")
+    Random.seed!(15)
+    orbs2 = random_orbits(3, 1e6u"kg")
+
+    fig = Figure(size=(1024, 600))
+    ax1 = Axis3(fig[1,1], azimuth=π/2+0.1, elevation=0.1π, title="two particles")
+    ax2 = Axis3(fig[1,2], azimuth=π/3, title="three particles")
+
+    plot_orbits!(ax1, orbs1)
+    plot_orbits!(ax2, orbs2)
+
+    save("episodes/fig/random-orbits.png", fig)
+    fig
+end
+
+end
+
+Script.main()
+```
 :::
