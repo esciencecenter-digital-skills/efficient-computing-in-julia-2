@@ -1,5 +1,5 @@
 ---
-title: (extra) GPU
+title: GPU Programming
 ---
 
 ::: questions

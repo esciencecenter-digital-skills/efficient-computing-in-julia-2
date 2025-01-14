@@ -1,5 +1,5 @@
 ---
-title: Julia Syntax
+title: Introduction to Julia
 ---
 
 ::: questions
