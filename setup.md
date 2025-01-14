@@ -2,6 +2,8 @@
 title: Setup
 ---
 
+# Setup
+
 This workshop is always taught using the latest release version of Julia. We use VS Code as our main environment. Depending on your experience, setting up your environment should take around 30min - 1h. We encourage you to also spend 1-2h exploring the Julia Manual.
 
 ## Equipment
@@ -13,9 +15,11 @@ You need a decent laptop with priviliges to install software. Julia is a compile
 ::: tab
 
 ### New installation
-Install Julia by following the instruction on [the Julia webpage, downloads section](https://julialang.org/downloads/). This will also install `juliaup` which maintains different versions of Julia on your machine. If you installed Julia previously and you need to upgrade, run:
+Install Julia by following the instruction on [the Julia webpage, downloads section](https://julialang.org/downloads/). This will also install `juliaup` which maintains different versions of Julia on your machine.
 
 ### Update old installation
+If you installed Julia previously and you need to upgrade, run:
+
 ```bash
 juliaup update
 juliaup default release   # to be sure

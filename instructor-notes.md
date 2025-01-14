@@ -76,3 +76,14 @@ The following sillabus assumes 6 hours of effective teaching per day.
   - closures to reduce allocations
   - static types to reduce dynamic look-up
 - Best practices with `BestieTemplate`: 1h
+
+## Oddities
+
+Many of the code blocks have a comment stating some sort of id.
+
+```julia
+#| id: code-block-id
+...
+```
+
+These are used to collect code blocks into executable units for automated testing and rendering of output figures, using [Entangled](https://entangled.github.io). You can certainly ignore them while teaching.
